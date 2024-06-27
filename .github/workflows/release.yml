@@ -29,3 +29,13 @@ jobs:
     - run: npm install
     - run: npm ci
     - run: npm run build --prod
+    - name: Deploy to Server
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SERVER_USER: ${{ secrets.SERVER_USER }}
+        SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      run: |
+        echo "$SSH_PRIVATE_KEY" > private_key
+        chmod 600 private_key
+        scp -i private_key -r . $SERVER_USER@$SERVER_HOST:/path/to/deployment/folder
+        ssh -i private_key $SERVER_USER@$SERVER_HOST 'bash /path/to/deployment/folder/deploy.sh'
